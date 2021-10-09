@@ -26,7 +26,9 @@ public class BallBehave : MonoBehaviour
     private int combo = 1;
     public GameObject gameUI;
     public bool paused;
+    public bool sideCollided = false;
     public bool allowCameraMove = true;
+    public Animation anim;
 
 
     
@@ -37,6 +39,11 @@ public class BallBehave : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         Application.targetFrameRate = 60;
         rb.velocity = new Vector3(0, -10f, 0);
+        //anim["jump"].speed = 0;
+        //anim["jump"].time = 0;
+        //anim["death"].speed = 0;
+        //anim["death"].time = 0;
+
     }
 
     // Update is called once per frame
@@ -98,9 +105,13 @@ public class BallBehave : MonoBehaviour
                 rb.velocity = new Vector3(0, yvel, 0);
                 yvel = 0;
             }
-            Collider[] gnd = Physics.OverlapSphere(rb.position, colR, plLayer);
+            
+            Vector3 gndVec = new Vector3(rb.position.x, rb.position.y - 0.25f, rb.position.z);
+            Collider[] gnd = Physics.OverlapSphere(gndVec, colR-0.25f, plLayer);
             Vector3 deathVec = new Vector3(rb.position.x, rb.position.y-0.25f, rb.position.z);
             Collider[] death = Physics.OverlapSphere(deathVec, colR-0.25f, dhLayer);
+
+            Collider[] sideCollider = Physics.OverlapSphere(rb.position, colR+0.1f, plLayer);
 
 
             /*Debug.Log(rb.velocity.y);*/
@@ -115,6 +126,7 @@ public class BallBehave : MonoBehaviour
             // касание платформы
             if (gnd.Length != 0 && rb.velocity.y <= 0)
             {
+                anim.Play();
                 speed = 0;
                 rb.velocity = new Vector3(rb.velocity.x, 7, rb.velocity.z);
                 combo = 1;
@@ -150,8 +162,15 @@ public class BallBehave : MonoBehaviour
                 }
                 else
                 {
-                    platforms.eulerAngles = new Vector3(0, platforms.eulerAngles.y + (clkPos - mousePos.x) / 4, 0);
-                    clkPos = mousePos.x;
+                    if ((sideCollider.Length == 0 || gnd.Length != 0) && death.Length == 0)
+                    {
+                        platforms.eulerAngles = new Vector3(0, platforms.eulerAngles.y + (clkPos - mousePos.x) / 4, 0);
+                        clkPos = mousePos.x;
+                    } else
+                    {
+                        clkPos = mousePos.x;
+                    }
+                    
                 }
 
             }
@@ -162,7 +181,6 @@ public class BallBehave : MonoBehaviour
 
             if ((cameraPos.position.y - rb.position.y > 4) && allowCameraMove) // камера
             {
-                print("cum move");
                 cameraPos.position = new Vector3(cameraPos.position.x, rb.position.y + 4, cameraPos.position.z);
             }
         } else
@@ -173,6 +191,7 @@ public class BallBehave : MonoBehaviour
                 rb.velocity = new Vector3(0, 0, 0);
             }
         }
+        sideCollided = false;
     }
 
     /*private void OnCollisionEnter(Collision collision)

@@ -20,9 +20,10 @@ public class BallBehave2 : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        print("collide");
         if (!par.GetComponent<BallBehave>().paused)
         {
-            par.GetComponent<BallBehave>().Death();
+            par.GetComponent<BallBehave>().sideCollided = true;
         }
     }
 }

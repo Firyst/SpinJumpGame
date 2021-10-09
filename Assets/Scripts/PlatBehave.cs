@@ -16,6 +16,8 @@ public class PlatBehave : MonoBehaviour
 
     public bool paused;
 
+    private int spawned = 0;
+
     List<Transform> passed = new List<Transform>();
 
 
@@ -37,7 +39,7 @@ public class PlatBehave : MonoBehaviour
                 Transform zone = plat.transform.GetChild(i);
                 zone.gameObject.SetActive(false);
             }
-            if (rnd.Next(0, 2) == 1) {
+            if (rnd.Next(0, 2) == 1 && (spawned > 3)) {
                 for (int i = 0; i < rnd.Next(0, 8); i++)
                 {
                     Transform zone = plat.transform.GetChild(rnd.Next(0, plat.childCount - 1));
@@ -46,7 +48,7 @@ public class PlatBehave : MonoBehaviour
             }
         }
         last_pos = last_pos - 10;
-
+        spawned += 1;
         plat.eulerAngles = new Vector3(plat.eulerAngles.x, plat.eulerAngles.y, rnd.Next(0, 300));
 
     }
@@ -65,7 +67,7 @@ public class PlatBehave : MonoBehaviour
             
         }
         last_pos = -70;
-
+        
     }
 
     void Start()
