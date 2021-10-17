@@ -69,8 +69,6 @@ public class BallBehave : MonoBehaviour
 
     public void Restart()
     {
-
-        
         combo = 1;
         score_text.text = "0";
         rb.velocity = new Vector3(0, 0, 0);
@@ -86,11 +84,7 @@ public class BallBehave : MonoBehaviour
     }
     public void Death()
     {
-
-
         gameUI.GetComponent<GameUIScript>().game_end();
-
-        /*SceneManager.LoadScene(0);*/
     }
 
 
@@ -114,7 +108,6 @@ public class BallBehave : MonoBehaviour
             Collider[] sideCollider = Physics.OverlapSphere(rb.position, colR+0.1f, plLayer);
 
 
-            /*Debug.Log(rb.velocity.y);*/
             speed = speed + dec;
 
             if (death.Length != 0) // детектор смерти
@@ -133,6 +126,7 @@ public class BallBehave : MonoBehaviour
                 combo_text.text = "x" + (combo).ToString();
                 combo_text.color = new Color(0.196f, 0.196f, 0.196f);
                 combo_text.gameObject.GetComponent<Animation>().enabled = false;
+                // rb.position = new Vector3(rb.position.x, Mathf.FloorToInt(rb.position.y / 10)*10 + 1.5f, rb.position.z);
             }
 
             // ограничитель скорости
@@ -192,6 +186,7 @@ public class BallBehave : MonoBehaviour
             }
         }
         sideCollided = false;
+
     }
 
     /*private void OnCollisionEnter(Collision collision)

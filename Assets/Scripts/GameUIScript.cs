@@ -83,7 +83,6 @@ public class GameUIScript : MonoBehaviour
     int get_highscore()
     {
         float highscore = Mathf.Pow(PlayerPrefs.GetFloat("highscore"), 8.5f);
-        print(highscore);
         if (Mathf.Abs(highscore - Mathf.RoundToInt(highscore)) < 0.001f)
         {
             return Mathf.RoundToInt(highscore);
