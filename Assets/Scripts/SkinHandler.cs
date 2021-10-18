@@ -13,14 +13,15 @@ public class SkinHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Reload();
     }
     int get_skin(string field)
     {
-        float highscore = Mathf.Pow(PlayerPrefs.GetFloat(field), 8.5f);
-        if (Mathf.Abs(highscore - Mathf.RoundToInt(highscore)) < 0.001f)
+        // получает число из player pref
+        float value = Mathf.Pow(PlayerPrefs.GetFloat(field), 8.5f);
+        if (Mathf.Abs(value - Mathf.RoundToInt(value)) < 0.001f)
         {
-            return Mathf.RoundToInt(highscore);
+            return Mathf.RoundToInt(value);
         }
         else
         {
@@ -29,12 +30,13 @@ public class SkinHandler : MonoBehaviour
     }
     public void Reload()
     {
-
+        innerSkin.material = innerSkins[get_skin("IS") - 1];
+        outerSkin.material = outerSkins[get_skin("OS") - 1];
     }
     // Update is called once per frame
     void Update()
     {
-        innerSkin.material = innerSkins[get_skin("IS")];
-        outerSkin.material = outerSkins[get_skin("OS")];
+        
+
     }
 }
