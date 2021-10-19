@@ -10,6 +10,9 @@ public class SkinHandler : MonoBehaviour
     public MeshRenderer innerSkin;
     public MeshRenderer outerSkin;
 
+    public int innerSkinID;
+    public int outerSkinID;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,8 +33,14 @@ public class SkinHandler : MonoBehaviour
     }
     public void Reload()
     {
-        innerSkin.material = innerSkins[get_skin("IS") - 1];
-        outerSkin.material = outerSkins[get_skin("OS") - 1];
+        innerSkinID = get_skin("IS");
+        outerSkinID = get_skin("OS");
+        Redraw();
+    }
+    public void Redraw()
+    {
+        innerSkin.material = innerSkins[innerSkinID - 1];
+        outerSkin.material = outerSkins[outerSkinID - 1];
     }
     // Update is called once per frame
     void Update()

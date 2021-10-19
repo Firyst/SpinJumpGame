@@ -7,8 +7,8 @@ using UnityEngine.SceneManagement;
 public class MenuScript : MonoBehaviour
 {
     public Button playButton, localButton, shopButton;
-    public Button shopLeftButton, shopRightButton, shopBuyButton, shopBackButton;
-    public Text outerSkinText, innerSkinText, moneyText;
+    public Button shopLeftButton, shopRightButton, shopLeftButtonO, shopRightButtonO, shopBuyButton, shopBuyButtonO, shopBackButton;
+    public Text outerSkinText, innerSkinText, outerSkinPrice, innerSkinPrice, moneyText;
     public Image fader;
     public Color curColor;
     public Animation fadeAnim;
@@ -22,13 +22,18 @@ public class MenuScript : MonoBehaviour
     private bool shop = false;
     private int innerSkin;
     private int outerSkin;
+
+    private int innerSkinEnter;
+    private int outerSkinEnter;
+
     private int innerSkinC;
     private int outerSkinC;
     private int currentMoney;
 
-    private int[] skinsData;
+    private int[] skinsDataI;
+    private int[] skinsDataO;
 
-    private int[] test = new int[10] { 10, 10, 10, 10, 10, 10, 10, 20, 20, 50 };
+    private int[] test = new int[10] { 0, 10, 10, 10, 10, 10, 10, 20, 20, 50 };
 
     int get_pref(string field)
     {
@@ -74,7 +79,6 @@ public class MenuScript : MonoBehaviour
             write_data = write_data + (rjust((data[i] * 85).ToString(), 16, "0"));
         }
         PlayerPrefs.SetString(field, write_data);
-        print(write_data);
     }
     void go_back()
     {
@@ -89,6 +93,9 @@ public class MenuScript : MonoBehaviour
         shopRightButton.enabled = false;
         shopBuyButton.enabled = false;
         shopBackButton.enabled = false;
+        shopLeftButtonO.enabled = false;
+        shopRightButtonO.enabled = false;
+        shopBuyButtonO.enabled = false;
 
         cameraAnim["cameraAnim"].speed = -1;
         cameraAnim["cameraAnim"].time = 1;
@@ -101,6 +108,7 @@ public class MenuScript : MonoBehaviour
         fadeAnim3.Play();
 
         cameraAnim.Play();
+        menuBall.GetComponent<SkinHandler>().Reload();
 
     }
     void start_game()
@@ -119,6 +127,9 @@ public class MenuScript : MonoBehaviour
         shopLeftButton.enabled = true;
         shopRightButton.enabled = true;
         shopBuyButton.enabled = true;
+        shopLeftButtonO.enabled = true;
+        shopRightButtonO.enabled = true;
+        shopBuyButtonO.enabled = true;
         shopBackButton.enabled = true;
 
         fadeAnim3["fade3"].speed = -1;
@@ -131,6 +142,100 @@ public class MenuScript : MonoBehaviour
         cameraAnim["cameraAnim"].speed = 1;
         cameraAnim["cameraAnim"].time = 0;
         cameraAnim.Play();
+
+        innerSkinEnter = get_pref("IS");
+        outerSkinEnter = get_pref("OS");
+        innerSkin = innerSkinEnter;
+        outerSkin = outerSkinEnter;
+        Reload();
+    }
+
+    void Reload()
+    {
+        //PlayerPrefs.SetFloat("IS", Mathf.Pow(innerSkin, 0.11764705f));
+        //PlayerPrefs.SetFloat("OS", Mathf.Pow(outerSkin, 0.11764705f));
+        menuBall.GetComponent<SkinHandler>().innerSkinID = innerSkin;
+        menuBall.GetComponent<SkinHandler>().outerSkinID = outerSkin;
+        menuBall.GetComponent<SkinHandler>().Redraw();
+
+        moneyText.text = "$" + (currentMoney).ToString();
+
+        // inner
+        if (skinsDataI[innerSkin - 1] == 0)
+        {
+            if (innerSkin == innerSkinEnter)
+            {
+                innerSkinPrice.text = "Chosen";
+            } else
+            {
+                innerSkinPrice.text = "Choose";
+            }
+            
+        } else
+        {
+            innerSkinPrice.text = "$" + (skinsDataI[innerSkin - 1].ToString());
+        }
+
+        // outer
+        if (skinsDataO[outerSkin - 1] == 0)
+        {
+            if (outerSkin == outerSkinEnter)
+            {
+                outerSkinPrice.text = "Chosen";
+            }
+            else
+            {
+                outerSkinPrice.text = "Choose";
+            }
+
+        }
+        else
+        {
+            outerSkinPrice.text = "$" + (skinsDataO[outerSkin - 1].ToString());
+        }
+    }
+    void SelectOuterSkin()
+    {
+        if (skinsDataO[outerSkin - 1] == 0)
+        {
+            outerSkinEnter = outerSkin;
+            updatePrefs();
+        } else
+        {
+            if (true)
+            {
+                currentMoney -= skinsDataO[outerSkin - 1];
+                skinsDataO[outerSkin - 1] = 0;
+                encode_skins_data(skinsDataO, "OSD");
+                outerSkinEnter = outerSkin;
+                updatePrefs();
+            }
+        }
+
+        Reload();
+    }
+
+    void SelectInnerSkin()
+    {
+        if (skinsDataI[innerSkin - 1] == 0)
+        {
+            innerSkinEnter = innerSkin;
+            updatePrefs();
+
+        }
+        else
+        {
+            if (true)
+            {
+                currentMoney -= skinsDataI[innerSkin - 1];
+                skinsDataI[innerSkin - 1] = 0;
+                encode_skins_data(skinsDataI, "ISD");
+                innerSkinEnter = innerSkin;
+                updatePrefs();
+            }
+        }
+
+        Reload();
     }
 
     void moveLeftI()
@@ -140,7 +245,7 @@ public class MenuScript : MonoBehaviour
         {
             innerSkin = innerSkinC;
         }
-        menuBall.GetComponent<SkinHandler>().Reload();
+        Reload();
     }
     void moveRightI()
     {
@@ -149,9 +254,8 @@ public class MenuScript : MonoBehaviour
         {
             innerSkin = 1;
         }
-        menuBall.GetComponent<SkinHandler>().Reload();
+        Reload();
     }
-
     void moveLeftO()
     {
         outerSkin -= 1;
@@ -159,9 +263,8 @@ public class MenuScript : MonoBehaviour
         {
             outerSkin = outerSkinC;
         }
-        menuBall.GetComponent<SkinHandler>().Reload();
+        Reload();
     }
-
     void MoveRightO()
     {
         outerSkin += 1;
@@ -169,19 +272,21 @@ public class MenuScript : MonoBehaviour
         {
             outerSkin = 1;
         }
+        Reload();
     }
+    
     void updatePrefs()
     {
         // обновить значения скинов в player prefs
-        PlayerPrefs.SetFloat("IS", Mathf.Pow(innerSkin, 0.11764705f));
-        PlayerPrefs.SetFloat("OS", Mathf.Pow(outerSkin, 0.11764705f));
+        PlayerPrefs.SetFloat("IS", Mathf.Pow(innerSkinEnter, 0.11764705f));
+        PlayerPrefs.SetFloat("OS", Mathf.Pow(outerSkinEnter, 0.11764705f));
+        PlayerPrefs.SetFloat("money", Mathf.Pow(currentMoney, 0.11764705f));
     }
     void Start()
     {
         innerSkinC = menuBall.GetComponent<SkinHandler>().innerSkins.Length;
         outerSkinC = menuBall.GetComponent<SkinHandler>().outerSkins.Length;
 
-        encode_skins_data(test, "debug");
 
         currentMoney = get_pref("money");
         moneyText.text = "$" + (currentMoney).ToString();
@@ -200,6 +305,13 @@ public class MenuScript : MonoBehaviour
         playButton.onClick.AddListener(start_game);
         shopButton.onClick.AddListener(visit_shop);
         shopBackButton.onClick.AddListener(go_back);
+        shopLeftButton.onClick.AddListener(moveLeftI);
+        shopRightButton.onClick.AddListener(moveRightI);
+        shopLeftButtonO.onClick.AddListener(moveLeftO);
+        shopRightButtonO.onClick.AddListener(MoveRightO);
+        shopBuyButton.onClick.AddListener(SelectInnerSkin);
+        shopBuyButtonO.onClick.AddListener(SelectOuterSkin);
+
 
         fadeAnim3["fade3"].speed = 0;
         fadeAnim3["fade3"].time = 1;
@@ -210,11 +322,19 @@ public class MenuScript : MonoBehaviour
         shopRightButton.enabled = false;
         shopBuyButton.enabled = false;
 
-        int[] xd = decode_skins_data("debug");
-        for (int i = 0; i < xd.Length; i++)
+        shopLeftButtonO.enabled = false;
+        shopRightButtonO.enabled = false;
+        shopBuyButtonO.enabled = false;
+
+        if (decode_skins_data("OSD").Length == 0)
         {
-            print(xd[i]);
+            skinsDataI = new int[23] { 0, 10, 10, 10, 10, 10, 10, 10, 10, 50, 50, 50, 50, 50, 50, 50, 50, 75, 75, 75, 75, 100, 999 };
+            encode_skins_data(skinsDataI, "ISD");
+            skinsDataO = new int[11] { 0, 50, 50, 50, 50, 100, 100, 150, 100, 100, 300 };
+            encode_skins_data(skinsDataO, "OSD");
         }
+        skinsDataI = decode_skins_data("ISD");
+        skinsDataO = decode_skins_data("OSD");
     }
 
     // Update is called once per frame
