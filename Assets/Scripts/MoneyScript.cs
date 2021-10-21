@@ -1,10 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MoneyScript : MonoBehaviour
 {
-    public GameObject moneyObject;
+    public GameObject moneyObject, moneyMesh, gameUI, coinsHandler;
+    public Collider coinCollider;
+    public int amount;
+    public Text animText;
+    public Animation textCollectAnim, collectAnim;
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -12,6 +19,12 @@ public class MoneyScript : MonoBehaviour
     }
 
     // Update is called once per frame
+
+    public void SetCollider(bool state)
+    {
+        coinCollider.enabled = state;
+    }
+
     void Update()
     {
         

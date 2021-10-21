@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class BallBehave2 : MonoBehaviour
 {
+    // наху€ этот скрипт вообще нужен?
     public LayerMask plLayer;
     public GameObject par;
     // Start is called before the first frame update
@@ -20,7 +21,6 @@ public class BallBehave2 : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        print("collide");
         if (!par.GetComponent<BallBehave>().paused)
         {
             par.GetComponent<BallBehave>().sideCollided = true;

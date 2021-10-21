@@ -16,10 +16,9 @@ public class MenuScript : MonoBehaviour
     public Animation fadeAnim3;
     public Animation cameraAnim;
     public Text title;
-    public GameObject menuBall;
+    public GameObject menuBall, ShopButtons;
 
 
-    private bool shop = false;
     private int innerSkin;
     private int outerSkin;
 
@@ -83,7 +82,7 @@ public class MenuScript : MonoBehaviour
     void go_back()
     {
         // выход из магазинчика 
-        shop = false;
+        ShopButtons.transform.localPosition = new Vector3(0, 9999, 0);
         title.text = "XDJump";
         fadeAnim3["fade3"].speed = 1;
         fadeAnim3["fade3"].time = 0;
@@ -118,7 +117,7 @@ public class MenuScript : MonoBehaviour
 
     void visit_shop()
     {
-        shop = true;
+        ShopButtons.transform.localPosition = new Vector3(0, 0, 0);
         title.text = "Shop";
         playButton.enabled = false;
         localButton.enabled = false;
@@ -131,6 +130,7 @@ public class MenuScript : MonoBehaviour
         shopRightButtonO.enabled = true;
         shopBuyButtonO.enabled = true;
         shopBackButton.enabled = true;
+
 
         fadeAnim3["fade3"].speed = -1;
         fadeAnim3["fade3"].time = 1;
@@ -287,6 +287,7 @@ public class MenuScript : MonoBehaviour
         innerSkinC = menuBall.GetComponent<SkinHandler>().innerSkins.Length;
         outerSkinC = menuBall.GetComponent<SkinHandler>().outerSkins.Length;
 
+        ShopButtons.transform.localPosition = new Vector3(0, 9999, 0);
 
         currentMoney = get_pref("money");
         moneyText.text = "$" + (currentMoney).ToString();
@@ -300,7 +301,6 @@ public class MenuScript : MonoBehaviour
         }
         innerSkin = get_pref("IS");
         outerSkin = get_pref("OS");
-        shop = false;
 
         playButton.onClick.AddListener(start_game);
         shopButton.onClick.AddListener(visit_shop);

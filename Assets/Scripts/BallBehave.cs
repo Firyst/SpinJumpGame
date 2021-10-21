@@ -16,6 +16,7 @@ public class BallBehave : MonoBehaviour
     public Text combo_text;
     public LayerMask plLayer;
     public LayerMask dhLayer;
+    public LayerMask cnLayer;
     public float colR;
     public float maxSpeed = 20;
     public float dec;
@@ -31,9 +32,21 @@ public class BallBehave : MonoBehaviour
     public Animation anim;
 
 
-    
 
-    // Start is called before the first frame update
+
+    int get_pref(string field)
+    {
+        // получает число из player pref
+        float value = Mathf.Pow(PlayerPrefs.GetFloat(field), 8.5f);
+        if (Mathf.Abs(value - Mathf.RoundToInt(value)) < 0.001f)
+        {
+            return Mathf.RoundToInt(value);
+        }
+        else
+        {
+            return 0;
+        }
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -105,6 +118,8 @@ public class BallBehave : MonoBehaviour
             Vector3 deathVec = new Vector3(rb.position.x, rb.position.y-0.25f, rb.position.z);
             Collider[] death = Physics.OverlapSphere(deathVec, colR-0.25f, dhLayer);
 
+            Collider[] coins = Physics.OverlapSphere(rb.position, 1, cnLayer);
+
             Collider[] sideCollider = Physics.OverlapSphere(rb.position, colR+0.1f, plLayer);
 
 
@@ -114,6 +129,16 @@ public class BallBehave : MonoBehaviour
             {
                 Death();
             }
+
+            // сбор монеток
+            if (coins.Length != 0)
+            {
+                print(coins[0].GetComponent<MoneyScript>().amount);
+
+                PlayerPrefs.SetFloat("money", Mathf.Pow(get_pref("money") + coins[0].GetComponent<MoneyScript>().amount, 0.11764705f));
+                coins[0].GetComponent<MoneyScript>().SetCollider(false);   
+            }
+
 
 
             // касание платформы
