@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 
 
@@ -15,6 +16,7 @@ public class PlatBehave : MonoBehaviour
     public float last_pos = -10;
 
     public bool paused;
+    public Text ScoreText;
 
     private int spawned = 0;
 
@@ -29,6 +31,8 @@ public class PlatBehave : MonoBehaviour
     void TeleportPlat(Transform plat)
     {
         var Rend = plat.GetComponent<Renderer>();
+        int score = int.Parse(ScoreText.text);
+
         plat.position = new Vector3(0, last_pos - 10, 0);
         /*Color col = new Color(255, 0, 0);
         Rend.material.SetColor("_Color", col);*/
@@ -39,10 +43,10 @@ public class PlatBehave : MonoBehaviour
                 Transform zone = plat.transform.GetChild(i);
                 zone.gameObject.SetActive(false);
             }
-            if (rnd.Next(0, 2) == 1 && (spawned > 3)) {
-                for (int i = 0; i < rnd.Next(0, 8); i++)
+            if ((UnityEngine.Random.Range(0, 50) < score) && (spawned > 3)) {
+                for (int i = 0; i < Mathf.Min(100, score / 30); i++)
                 {
-                    Transform zone = plat.transform.GetChild(rnd.Next(0, plat.childCount - 1));
+                    Transform zone = plat.transform.GetChild(UnityEngine.Random.Range(0, plat.childCount));
                     zone.gameObject.SetActive(true);
                 }
             }
@@ -53,7 +57,23 @@ public class PlatBehave : MonoBehaviour
 
     }
 
-    public void Restart()
+    public void PlatRemoveZones()
+    {
+        for (int i = 0; i < handler.transform.childCount; i++)
+        {
+            Transform plat = handler.transform.GetChild(i);
+            if (plat.tag != "Start_platform")
+            {
+                // убрать все дедзоны на платформах
+                for (int j = 0; j < plat.childCount; j++)
+                {
+                    Transform zone = plat.transform.GetChild(j);
+                    zone.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+    public void RestartPlat()
     {
         for (int i = 0; i < handler.transform.childCount; i++)
         {
@@ -61,7 +81,6 @@ public class PlatBehave : MonoBehaviour
             if (plat.tag != "Start_platform")
             {
                 plat.position = new Vector3(plat.position.x, plat.position.y - last_pos + Mathf.Max(-70, last_pos), plat.position.z);
-
             }
 
             

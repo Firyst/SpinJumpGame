@@ -13,17 +13,35 @@ public class CoinHandler : MonoBehaviour
     public Material Silver;
     public Material Gold;
 
+    
+
     private int last_coin;
     // Start is called before the first frame update
     void Start()
     {
-        last_coin = -55;
+        last_coin = -54;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void HideCoins()
+    {
+        foreach (Transform coin in CoinsHandler.transform)
+        {
+            coin.GetComponent<MoneyScript>().SetCollider(false);
+        }
+    }
+    public void Restart()
+    {
+        foreach (Transform coin in CoinsHandler.transform)
+        {
+            coin.transform.position = new Vector3(coin.transform.position.x, 100, coin.transform.position.z);
+        }
+        last_coin = -54;
     }
 
     private void FixedUpdate()
@@ -35,20 +53,19 @@ public class CoinHandler : MonoBehaviour
                 // проходимся по детям (монеткам), перемещаем их по необходимости
             {
                 coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Bronze;
-                int pos = last_coin - Random.Range(10, 15) * 10;
+                int pos = last_coin - Random.Range(7, 12) * 10;
                 coin.transform.position = new Vector3(coin.transform.position.x, pos, coin.transform.position.z);
                 coin.GetComponent<MoneyScript>().SetCollider(true);
                 last_coin = pos;
-                print(score);
-                if (score > 10)
+                if (score > 48)
                 {
                     print("silver");
                     coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Silver;
-                    coin.GetComponent<MoneyScript>().amount = Random.Range(2, 4);
-                    if (score > 40)
+                    coin.GetComponent<MoneyScript>().amount = Random.Range(3, 6);
+                    if (score > 96)
                     {
                         coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Gold;
-                        coin.GetComponent<MoneyScript>().amount = Random.Range(5, 7);
+                        coin.GetComponent<MoneyScript>().amount = Random.Range(6, 15);
                     }
                 } else
                 {

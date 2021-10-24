@@ -9,7 +9,7 @@ public class MoneyScript : MonoBehaviour
     public Collider coinCollider;
     public int amount;
     public Text animText;
-    public Animation textCollectAnim, collectAnim;
+    public Animation collectAnim;
     
 
     // Start is called before the first frame update
@@ -23,6 +23,16 @@ public class MoneyScript : MonoBehaviour
     public void SetCollider(bool state)
     {
         coinCollider.enabled = state;
+        if (state)
+        {
+            collectAnim["moneyAnim"].speed = 0;
+            collectAnim["moneyAnim"].time = 0;
+            collectAnim.Play();
+        } else
+        {
+            collectAnim["moneyAnim"].speed = 1.25f;
+            collectAnim.Play();
+        }
     }
 
     void Update()

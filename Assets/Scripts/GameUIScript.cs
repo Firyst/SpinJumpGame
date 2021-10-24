@@ -13,6 +13,7 @@ public class GameUIScript : MonoBehaviour
     public GameObject menu;
     public GameObject player;
     public GameObject platforms;
+    public GameObject coins;
     public Animation pauseAnim;
     public Animation fadeAnim;
     public Animation deathAnim;
@@ -32,6 +33,7 @@ public class GameUIScript : MonoBehaviour
     public Animation fAnim4;
     public Animation rAnim1;
 
+
     private bool isQuit = false;
     private bool isRestart = false;
 
@@ -40,9 +42,9 @@ public class GameUIScript : MonoBehaviour
     // Start is called before the first frame update
 
 
-    public void Reset()
+    public void Begin()
     {
-        
+        platforms.GetComponent<PlatBehave>().RestartPlat();
         deathAnim["death"].time = 0.4f;
         deathAnim["death"].speed = -1;
         deathAnim.Play();
@@ -58,7 +60,10 @@ public class GameUIScript : MonoBehaviour
         paused = false;
 
 
-        platforms.GetComponent<PlatBehave>().paused = paused;
+        platforms.GetComponent<PlatBehave>().paused = false;
+        coins.GetComponent<CoinHandler>().Restart();
+        
+
         Setup();
         pauseButton.enabled = true;
         print(pauseButton.enabled);
@@ -75,6 +80,7 @@ public class GameUIScript : MonoBehaviour
         deathAnim.Play();
         isRestart = true;
         rAnim1.Play();
+        coins.GetComponent<CoinHandler>().HideCoins();
         // platforms.GetComponent<PlatBehave>().Restart();
 
     }
@@ -96,7 +102,7 @@ public class GameUIScript : MonoBehaviour
     {
         paused = true;
         pauseButton.enabled = false;
-        platforms.GetComponent<PlatBehave>().paused = paused;
+        platforms.GetComponent<PlatBehave>().paused = true;
         pauseImage.enabled = false;
         playImage.enabled = false;
         menuImage.enabled = true;
@@ -128,10 +134,12 @@ public class GameUIScript : MonoBehaviour
         }
 
         HighSText.text = "High: " + get_highscore();
+        
     }
 
     void pause()
     {
+        print("pause event " + (paused).ToString());
         paused = !paused;
         pauseImage.enabled = !paused;
         platforms.GetComponent<PlatBehave>().paused = paused;
@@ -164,6 +172,9 @@ public class GameUIScript : MonoBehaviour
     void Start()
     {
         Setup();
+        pauseButton.onClick.AddListener(pause);
+        quitButton.onClick.AddListener(quit);
+        restartButton.onClick.AddListener(Restart);
     }
 
     // Update is called once per frame
@@ -175,9 +186,7 @@ public class GameUIScript : MonoBehaviour
         menuImage.enabled = false;
         quitButton.enabled = false;
         restartButton.enabled = false;
-        pauseButton.onClick.AddListener(pause);
-        quitButton.onClick.AddListener(quit);
-        restartButton.onClick.AddListener(Restart);
+
         pauseAnim["paused_breath"].speed = 0;
         pauseAnim["paused_breath"].time = 0;
 
@@ -202,11 +211,6 @@ public class GameUIScript : MonoBehaviour
         fAnim4.Play();
         rAnim1.Play();
 
-        /*fAnim1.Stop();
-        fAnim2.Stop();
-        fAnim3.Stop();
-        fAnim4.Stop();
-        rAnim1.Stop();*/
     }
     void Update()
     {

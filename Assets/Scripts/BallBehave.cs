@@ -29,9 +29,12 @@ public class BallBehave : MonoBehaviour
     public bool paused;
     public bool sideCollided = false;
     public bool allowCameraMove = true;
-    public Animation anim;
+    public Animation anim, coinAnim;
+    public Text moneyText;
 
-
+    public Material platMat;
+    public Material poleMat;
+    public Camera cameraC;
 
 
     int get_pref(string field)
@@ -52,11 +55,14 @@ public class BallBehave : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         Application.targetFrameRate = 60;
         rb.velocity = new Vector3(0, -10f, 0);
-        //anim["jump"].speed = 0;
-        //anim["jump"].time = 0;
-        //anim["death"].speed = 0;
-        //anim["death"].time = 0;
 
+        coinAnim["moneyCollectAnim"].time = 0;
+        coinAnim["moneyCollectAnim"].speed = 0;
+        coinAnim.Play();
+
+        platMat.color = UnityEngine.Color.HSVToRGB(200 / 360f, 0.9f, 0.9f);
+        poleMat.color = UnityEngine.Color.HSVToRGB(190 / 360f, 0.75f, 0.5f);
+        cameraC.backgroundColor = UnityEngine.Color.HSVToRGB(220 / 360f, 0.5f, 0.7f);
     }
 
     // Update is called once per frame
@@ -77,6 +83,10 @@ public class BallBehave : MonoBehaviour
         combo += 1;
         last_plat -= 10;
         allowCameraMove = true;
+
+        platMat.color = UnityEngine.Color.HSVToRGB(Mathf.Clamp(200-int.Parse(score_text.text), 0, 360) /360f, 0.9f, 0.9f);
+        poleMat.color = UnityEngine.Color.HSVToRGB(Mathf.Clamp(190 - int.Parse(score_text.text), 0, 360) / 360f, 0.75f, 0.5f);
+        cameraC.backgroundColor = UnityEngine.Color.HSVToRGB(Mathf.Clamp(220 - int.Parse(score_text.text), 0, 360) / 360f, 0.5f, 0.7f);
     }
 
 
@@ -92,8 +102,10 @@ public class BallBehave : MonoBehaviour
         // Debug.Log("reset");
         last_plat = -20;
 
-        platforms.gameObject.GetComponent<PlatBehave>().Restart();
+        platforms.gameObject.GetComponent<PlatBehave>().RestartPlat();
         cameraPos.gameObject.GetComponent<CameraBehave>().StartAnimaton();
+
+
     }
     public void Death()
     {
@@ -115,8 +127,8 @@ public class BallBehave : MonoBehaviour
             
             Vector3 gndVec = new Vector3(rb.position.x, rb.position.y - 0.25f, rb.position.z);
             Collider[] gnd = Physics.OverlapSphere(gndVec, colR-0.25f, plLayer);
-            Vector3 deathVec = new Vector3(rb.position.x, rb.position.y-0.25f, rb.position.z);
-            Collider[] death = Physics.OverlapSphere(deathVec, colR-0.25f, dhLayer);
+            Vector3 deathVec = new Vector3(rb.position.x, rb.position.y-0.35f, rb.position.z);
+            Collider[] death = Physics.OverlapSphere(deathVec, colR-0.35f, dhLayer);
 
             Collider[] coins = Physics.OverlapSphere(rb.position, 1, cnLayer);
 
@@ -132,9 +144,11 @@ public class BallBehave : MonoBehaviour
 
             // сбор монеток
             if (coins.Length != 0)
-            {
-                print(coins[0].GetComponent<MoneyScript>().amount);
-
+            {;
+                moneyText.text = "+$" + (coins[0].GetComponent<MoneyScript>().amount).ToString();
+                coinAnim["moneyCollectAnim"].time = 0;
+                coinAnim["moneyCollectAnim"].speed = 1;
+                coinAnim.Play();
                 PlayerPrefs.SetFloat("money", Mathf.Pow(get_pref("money") + coins[0].GetComponent<MoneyScript>().amount, 0.11764705f));
                 coins[0].GetComponent<MoneyScript>().SetCollider(false);   
             }

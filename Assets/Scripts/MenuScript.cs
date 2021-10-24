@@ -202,7 +202,7 @@ public class MenuScript : MonoBehaviour
             updatePrefs();
         } else
         {
-            if (true)
+            if (currentMoney >= skinsDataO[outerSkin - 1])
             {
                 currentMoney -= skinsDataO[outerSkin - 1];
                 skinsDataO[outerSkin - 1] = 0;
@@ -225,7 +225,7 @@ public class MenuScript : MonoBehaviour
         }
         else
         {
-            if (true)
+            if (currentMoney >= skinsDataI[innerSkin - 1])
             {
                 currentMoney -= skinsDataI[innerSkin - 1];
                 skinsDataI[innerSkin - 1] = 0;
