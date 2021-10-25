@@ -53,23 +53,25 @@ public class CoinHandler : MonoBehaviour
                 // проходимся по детям (монеткам), перемещаем их по необходимости
             {
                 coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Bronze;
-                int pos = last_coin - Random.Range(7, 12) * 10;
+                int pos = last_coin - Random.Range(5, 10) * 10;
                 coin.transform.position = new Vector3(coin.transform.position.x, pos, coin.transform.position.z);
-                coin.GetComponent<MoneyScript>().SetCollider(true);
+                coin.GetComponent<MoneyScript>().SetCollider(true); // включение коллайдера на монетке
                 last_coin = pos;
-                if (score > 48)
+                if (score > 45)
                 {
-                    print("silver");
-                    coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Silver;
-                    coin.GetComponent<MoneyScript>().amount = Random.Range(3, 6);
-                    if (score > 96)
-                    {
+                    if (score > 95)
+                    { // золотая монетка
                         coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Gold;
-                        coin.GetComponent<MoneyScript>().amount = Random.Range(6, 15);
+                        coin.GetComponent<MoneyScript>().amount = 3 * (score / 50);
+                    } else
+                    { // серебряная монетка
+                        coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Silver;
+                        coin.GetComponent<MoneyScript>().amount = 2 * (score / 50);
                     }
                 } else
                 {
-                    coin.GetComponent<MoneyScript>().amount = Random.Range(1, 2);
+                    // бронзовая монетка
+                    coin.GetComponent<MoneyScript>().amount = 1;
                 }
             }
         }

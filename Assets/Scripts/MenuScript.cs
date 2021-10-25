@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuScript : MonoBehaviour
 {
-    public Button playButton, localButton, shopButton;
+    public Button playButton, shopButton;
     public Button shopLeftButton, shopRightButton, shopLeftButtonO, shopRightButtonO, shopBuyButton, shopBuyButtonO, shopBackButton;
     public Text outerSkinText, innerSkinText, outerSkinPrice, innerSkinPrice, moneyText;
     public Image fader;
@@ -100,7 +100,6 @@ public class MenuScript : MonoBehaviour
         cameraAnim["cameraAnim"].time = 1;
 
         playButton.enabled = true;
-        localButton.enabled = true;
         shopButton.enabled = true;
 
         fadeAnim2.Play();
@@ -120,7 +119,6 @@ public class MenuScript : MonoBehaviour
         ShopButtons.transform.localPosition = new Vector3(0, 0, 0);
         title.text = "Shop";
         playButton.enabled = false;
-        localButton.enabled = false;
         shopButton.enabled = false;
 
         shopLeftButton.enabled = true;
@@ -295,9 +293,12 @@ public class MenuScript : MonoBehaviour
         if (get_pref("OS") == 0 || get_pref("IS") == 0)
         {
             // если нет записей о скинах, или они сломаны, то сбрасываем на дефолтные
+            innerSkinEnter = 1;
+            outerSkinEnter = 1;
+            updatePrefs();
             innerSkin = 1;
             outerSkin = 1;
-            updatePrefs();
+            
         }
         innerSkin = get_pref("IS");
         outerSkin = get_pref("OS");
@@ -325,9 +326,10 @@ public class MenuScript : MonoBehaviour
         shopLeftButtonO.enabled = false;
         shopRightButtonO.enabled = false;
         shopBuyButtonO.enabled = false;
-
+       
         if (decode_skins_data("OSD").Length == 0)
         {
+            print("Creaing new skins data...");
             skinsDataI = new int[23] { 0, 10, 10, 10, 10, 10, 10, 10, 10, 50, 50, 50, 50, 50, 50, 50, 50, 75, 75, 75, 75, 100, 999 };
             encode_skins_data(skinsDataI, "ISD");
             skinsDataO = new int[11] { 0, 50, 50, 50, 50, 100, 100, 150, 100, 100, 300 };
@@ -335,6 +337,8 @@ public class MenuScript : MonoBehaviour
         }
         skinsDataI = decode_skins_data("ISD");
         skinsDataO = decode_skins_data("OSD");
+
+        Reload();
     }
 
     // Update is called once per frame
