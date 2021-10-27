@@ -62,11 +62,11 @@ public class CoinHandler : MonoBehaviour
                     if (score > 95)
                     { // золотая монетка
                         coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Gold;
-                        coin.GetComponent<MoneyScript>().amount = 3 * (score / 50);
+                        coin.GetComponent<MoneyScript>().amount = 1 + ((score + 5) / 25);
                     } else
                     { // серебряная монетка
                         coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Silver;
-                        coin.GetComponent<MoneyScript>().amount = 2 * (score / 50);
+                        coin.GetComponent<MoneyScript>().amount = ((score + 5) / 25);
                     }
                 } else
                 {

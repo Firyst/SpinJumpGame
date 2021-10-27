@@ -10,7 +10,8 @@ public class MoneyScript : MonoBehaviour
     public int amount;
     public Text animText;
     public Animation collectAnim;
-    
+
+    private bool currentState = true;
 
     // Start is called before the first frame update
     void Start()
@@ -28,10 +29,15 @@ public class MoneyScript : MonoBehaviour
             collectAnim["moneyAnim"].speed = 0;
             collectAnim["moneyAnim"].time = 0;
             collectAnim.Play();
+            currentState = true;
         } else
         {
-            collectAnim["moneyAnim"].speed = 1.25f;
-            collectAnim.Play();
+            if (currentState)
+            {
+                collectAnim["moneyAnim"].speed = 1.25f;
+                collectAnim.Play();
+                currentState = false;
+            }
         }
     }
 

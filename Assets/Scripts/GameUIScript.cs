@@ -21,6 +21,7 @@ public class GameUIScript : MonoBehaviour
     public Text ScoreText;
     public Text HighSText;
     public Text CurrSText;
+    public Text MoneyText;
 
     public Image pauseImage;
     public Image playImage;
@@ -32,6 +33,7 @@ public class GameUIScript : MonoBehaviour
     public Animation fAnim3;
     public Animation fAnim4;
     public Animation rAnim1;
+    public Animation rAnim2;
 
 
     private bool isQuit = false;
@@ -41,7 +43,19 @@ public class GameUIScript : MonoBehaviour
 
     // Start is called before the first frame update
 
-
+    int get_pref(string field)
+    {
+        // получает число из player pref
+        float value = Mathf.Pow(PlayerPrefs.GetFloat(field), 8.5f);
+        if (Mathf.Abs(value - Mathf.RoundToInt(value)) < 0.001f)
+        {
+            return Mathf.RoundToInt(value);
+        }
+        else
+        {
+            return 0;
+        }
+    }
     public void Begin()
     {
         platforms.GetComponent<PlatBehave>().RestartPlat();
@@ -75,6 +89,10 @@ public class GameUIScript : MonoBehaviour
         rAnim1["fadeC1"].time = 0;
         deathAnim["death"].speed = 1;
 
+        rAnim2["game_over_anim4"].time = 1;
+        rAnim2["game_over_anim4"].speed = -1;
+        rAnim2.Play();
+
         player.GetComponent<BallBehave>().allowCameraMove = false;
         restartButton.enabled = false;
         deathAnim.Play();
@@ -100,6 +118,8 @@ public class GameUIScript : MonoBehaviour
 
     public void game_end()
     {
+        MoneyText.text = "$" + (get_pref("money")).ToString();
+
         paused = true;
         pauseButton.enabled = false;
         platforms.GetComponent<PlatBehave>().paused = true;
@@ -114,7 +134,10 @@ public class GameUIScript : MonoBehaviour
         fAnim3["game_over_anim3"].speed = 1;
         fAnim4["paused_breath"].speed = 1;
         fAnim4["paused_breath"].time = 0;
+        rAnim2["game_over_anim4"].time = 0;
+        rAnim2["game_over_anim4"].speed = 1;
 
+        rAnim2.Play();
         fAnim1.Play();
         fAnim2.Play();
         fAnim3.Play();
@@ -205,6 +228,10 @@ public class GameUIScript : MonoBehaviour
         rAnim1["fadeC1"].speed = 0;
         rAnim1["fadeC1"].time = 0;
 
+        rAnim2["game_over_anim4"].time = 0;
+        rAnim2["game_over_anim4"].speed = 0;
+
+        rAnim2.Play();
         fAnim1.Play();
         fAnim2.Play();
         fAnim3.Play();

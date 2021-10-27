@@ -63,6 +63,7 @@ public class BallBehave : MonoBehaviour
         platMat.color = UnityEngine.Color.HSVToRGB(200 / 360f, 0.9f, 0.9f);
         poleMat.color = UnityEngine.Color.HSVToRGB(190 / 360f, 0.75f, 0.5f);
         cameraC.backgroundColor = UnityEngine.Color.HSVToRGB(220 / 360f, 0.5f, 0.7f);
+        rb.gameObject.GetComponent<SkinHandler>().Reload();
     }
 
     // Update is called once per frame
