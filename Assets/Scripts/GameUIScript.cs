@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using GoogleMobileAds.Api;
+using GoogleMobileAds.Common;
+using System;
 
 public class GameUIScript : MonoBehaviour
 {
@@ -60,6 +62,7 @@ public class GameUIScript : MonoBehaviour
         rewarded = new RewardedAd(adUnitId);
 
         rewarded.OnUserEarnedReward += ad_end;
+        rewarded.OnAdClosed += ad_closed;
 
         AdRequest request = new AdRequest.Builder().Build();
         rewarded.LoadAd(request);
@@ -143,7 +146,11 @@ public class GameUIScript : MonoBehaviour
         }
     }
 
-
+    public void ad_closed(object sender, EventArgs args)
+    {
+        ad_playing = true;
+        game_end();
+    }
     int get_highscore()
     {
         float highscore = Mathf.Pow(PlayerPrefs.GetFloat("highscore"), 8.5f);
