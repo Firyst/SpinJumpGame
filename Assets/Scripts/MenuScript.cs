@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
 public class MenuScript : MonoBehaviour
 {
     public Button playButton, shopButton;
@@ -32,7 +33,7 @@ public class MenuScript : MonoBehaviour
     private int[] skinsDataI;
     private int[] skinsDataO;
 
-    private int[] test = new int[10] { 0, 10, 10, 10, 10, 10, 10, 20, 20, 50 };
+    private bool is_shop = false;
 
     int get_pref(string field)
     {
@@ -81,33 +82,39 @@ public class MenuScript : MonoBehaviour
     }
     void go_back()
     {
-        // выход из магазинчика 
-        ShopButtons.transform.localPosition = new Vector3(0, 9999, 0);
-        title.text = "XDJump";
-        fadeAnim3["fade3"].speed = 1;
-        fadeAnim3["fade3"].time = 0;
-        fadeAnim2["fade2"].speed = -1;
-        fadeAnim2["fade2"].time = 1;
-        shopLeftButton.enabled = false;
-        shopRightButton.enabled = false;
-        shopBuyButton.enabled = false;
-        shopBackButton.enabled = false;
-        shopLeftButtonO.enabled = false;
-        shopRightButtonO.enabled = false;
-        shopBuyButtonO.enabled = false;
+        if (is_shop)
+        {
+            // выход из магазинчика 
+            is_shop = false;
+            ShopButtons.transform.localPosition = new Vector3(0, 9999, 0);
+            title.text = "Spin&Jump";
+            fadeAnim3["fade3"].speed = 1;
+            fadeAnim3["fade3"].time = 0;
+            fadeAnim2["fade2"].speed = -1;
+            fadeAnim2["fade2"].time = 1;
+            shopLeftButton.enabled = false;
+            shopRightButton.enabled = false;
+            shopBuyButton.enabled = false;
+            // shopBackButton.enabled = false;
+            shopLeftButtonO.enabled = false;
+            shopRightButtonO.enabled = false;
+            shopBuyButtonO.enabled = false;
 
-        cameraAnim["cameraAnim"].speed = -1;
-        cameraAnim["cameraAnim"].time = 1;
+            cameraAnim["cameraAnim"].speed = -1;
+            cameraAnim["cameraAnim"].time = 1;
 
-        playButton.enabled = true;
-        shopButton.enabled = true;
+            playButton.enabled = true;
+            shopButton.enabled = true;
 
-        fadeAnim2.Play();
-        fadeAnim3.Play();
+            fadeAnim2.Play();
+            fadeAnim3.Play();
 
-        cameraAnim.Play();
-        menuBall.GetComponent<SkinHandler>().Reload();
-
+            cameraAnim.Play();
+            menuBall.GetComponent<SkinHandler>().Reload();
+        } else
+        {
+            Application.OpenURL("https://play.google.com/store/apps/developer?id=NKLP");
+        }
     }
     void start_game()
     {
@@ -116,6 +123,7 @@ public class MenuScript : MonoBehaviour
 
     void visit_shop()
     {
+        is_shop = true;
         ShopButtons.transform.localPosition = new Vector3(0, 0, 0);
         title.text = "Shop";
         playButton.enabled = false;
@@ -127,7 +135,7 @@ public class MenuScript : MonoBehaviour
         shopLeftButtonO.enabled = true;
         shopRightButtonO.enabled = true;
         shopBuyButtonO.enabled = true;
-        shopBackButton.enabled = true;
+        // shopBackButton.enabled = true;
 
 
         fadeAnim3["fade3"].speed = -1;
@@ -327,10 +335,10 @@ public class MenuScript : MonoBehaviour
         shopRightButtonO.enabled = false;
         shopBuyButtonO.enabled = false;
        
-        if (decode_skins_data("OSD").Length == 0)
+        if (decode_skins_data("OSD").Length < 11 || decode_skins_data("ISD").Length < 24)
         {
             print("Creaing new skins data...");
-            skinsDataI = new int[23] { 0, 10, 10, 10, 10, 10, 10, 10, 10, 50, 50, 50, 50, 50, 50, 50, 50, 75, 75, 75, 75, 100, 999 };
+            skinsDataI = new int[24] { 0, 10, 10, 10, 10, 10, 10, 10, 10, 50, 50, 50, 50, 50, 50, 50, 50, 75, 75, 75, 75, 100, 500, 999 };
             encode_skins_data(skinsDataI, "ISD");
             skinsDataO = new int[11] { 0, 50, 50, 50, 50, 100, 100, 150, 100, 100, 300 };
             encode_skins_data(skinsDataO, "OSD");

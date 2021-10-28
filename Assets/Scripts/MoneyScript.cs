@@ -10,8 +10,10 @@ public class MoneyScript : MonoBehaviour
     public int amount;
     public Text animText;
     public Animation collectAnim;
+    public bool isGlowing = false;
 
     private bool currentState = true;
+    private int matColor = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -49,5 +51,15 @@ public class MoneyScript : MonoBehaviour
     private void FixedUpdate()
     {
         moneyObject.transform.eulerAngles = new Vector3(moneyObject.transform.eulerAngles.x, moneyObject.transform.eulerAngles.y + 5, moneyObject.transform.eulerAngles.z);
+        if (isGlowing)
+        {
+            Color color = UnityEngine.Color.HSVToRGB((matColor % 360)/360f, 0.95f, 0.65f);
+            moneyMesh.GetComponent<MeshRenderer>().material.SetColor("_EmissionColor", color);
+        }
+        matColor += 6;
+        if (matColor > 360)
+        {
+            matColor = 0;
+        }
     }
 }

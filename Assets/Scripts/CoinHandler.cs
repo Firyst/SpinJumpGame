@@ -12,8 +12,8 @@ public class CoinHandler : MonoBehaviour
     public Material Bronze;
     public Material Silver;
     public Material Gold;
+    public Material Diamond;
 
-    
 
     private int last_coin;
     // Start is called before the first frame update
@@ -57,9 +57,17 @@ public class CoinHandler : MonoBehaviour
                 coin.transform.position = new Vector3(coin.transform.position.x, pos, coin.transform.position.z);
                 coin.GetComponent<MoneyScript>().SetCollider(true); // включение коллайдера на монетке
                 last_coin = pos;
+                coin.GetComponent<MoneyScript>().isGlowing = false;
                 if (score > 45)
                 {
-                    if (score > 95)
+                    if (score > 150)
+                    {
+                        // алмазная rgb монетка
+                        coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Diamond;
+                        coin.GetComponent<MoneyScript>().amount = 2*((score + 5) / 25) - 1;
+                        coin.GetComponent<MoneyScript>().isGlowing = true;
+                    }
+                    else if (score > 95)
                     { // золотая монетка
                         coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Gold;
                         coin.GetComponent<MoneyScript>().amount = 1 + ((score + 5) / 25);

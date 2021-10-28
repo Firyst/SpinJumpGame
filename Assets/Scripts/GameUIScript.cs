@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using GoogleMobileAds.Api;
 
 public class GameUIScript : MonoBehaviour
 {
     public Button pauseButton;
     public Button quitButton;
     public Button restartButton;
+    public Button adSkipButton;
     public bool paused = false;
     public GameObject menu;
     public GameObject player;
@@ -34,14 +36,34 @@ public class GameUIScript : MonoBehaviour
     public Animation fAnim4;
     public Animation rAnim1;
     public Animation rAnim2;
-
+    public Animation reviveAnim1;
+    public Animation reviveAnim2;
+    public Animation reviveAnim3; // текст no thanks
 
     private bool isQuit = false;
     private bool isRestart = false;
+    private bool ad_available = true;
+    private bool ad_playing = false;
+    private bool ad_played = false;
+    private bool decline_enabled = false; // вылезла ли кнопка no thanks
 
+    private float ad_time = 0;
 
+    public RewardedAd rewarded;
 
     // Start is called before the first frame update
+    public void RequestReliveRewarded()
+    {
+        string adUnitId = "ca-app-pub-3940256099942544/5224354917";
+        //string adUnitId = "ca-app-pub-8454720276447685/2412245698"; // Мой АЙДИ";
+
+        rewarded = new RewardedAd(adUnitId);
+
+        rewarded.OnUserEarnedReward += ad_end;
+
+        AdRequest request = new AdRequest.Builder().Build();
+        rewarded.LoadAd(request);
+    }
 
     int get_pref(string field)
     {
@@ -58,6 +80,7 @@ public class GameUIScript : MonoBehaviour
     }
     public void Begin()
     {
+        decline_enabled = false;
         platforms.GetComponent<PlatBehave>().RestartPlat();
         deathAnim["death"].time = 0.4f;
         deathAnim["death"].speed = -1;
@@ -80,27 +103,44 @@ public class GameUIScript : MonoBehaviour
 
         Setup();
         pauseButton.enabled = true;
-        print(pauseButton.enabled);
     }
 
     public void Restart()
     {
-        rAnim1["fadeC1"].speed = 1;
-        rAnim1["fadeC1"].time = 0;
-        deathAnim["death"].speed = 1;
+        if (ad_playing)
+        {
+            play_ad();
 
-        rAnim2["game_over_anim4"].time = 1;
-        rAnim2["game_over_anim4"].speed = -1;
-        rAnim2.Play();
+        }
+        else
+        {
+            if (!ad_played)
+            {
+                rAnim2["game_over_anim4"].time = 1;
+                rAnim2["game_over_anim4"].speed = -1;
+                CurrSText.text = "0";
+                ad_available = true;
+                RequestReliveRewarded();
+            } else
+            {
+                ad_available = false;
+            }
+            rAnim1["fadeC1"].speed = 1;
+            rAnim1["fadeC1"].time = 0;
+            deathAnim["death"].speed = 1;
 
-        player.GetComponent<BallBehave>().allowCameraMove = false;
-        restartButton.enabled = false;
-        deathAnim.Play();
-        isRestart = true;
-        rAnim1.Play();
-        coins.GetComponent<CoinHandler>().HideCoins();
-        // platforms.GetComponent<PlatBehave>().Restart();
+            rAnim2.Play();
 
+
+            player.GetComponent<BallBehave>().allowCameraMove = false;
+            restartButton.enabled = false;
+            deathAnim.Play();
+            isRestart = true;
+            rAnim1.Play();
+            coins.GetComponent<CoinHandler>().HideCoins();
+            // platforms.GetComponent<PlatBehave>().Restart();
+            ad_played = false;
+        }
     }
 
 
@@ -116,10 +156,60 @@ public class GameUIScript : MonoBehaviour
         }
     }
 
+    void play_ad()
+    {
+        // реклама
+
+        ad_played = true;
+        ad_playing = false;
+
+        if (rewarded.IsLoaded())
+        {
+            rewarded.Show();
+        } else
+        {
+            reviveAnim1["game_over_anim"].time = 1;
+            reviveAnim1["game_over_anim"].speed = -1;
+            reviveAnim2["revive_image_anim"].time = 1;
+            reviveAnim2["revive_image_anim"].speed = -1;
+            if (decline_enabled)
+            {
+                reviveAnim3["game_over_anim"].time = 1;
+                reviveAnim3["game_over_anim"].speed = -1;
+            }
+
+            reviveAnim1.Play();
+            reviveAnim2.Play();
+            reviveAnim3.Play();
+
+            Restart();
+        }
+    }
+
+    void ad_end(object sender, Reward args)
+    {
+        // вызывается после воспроизведнеия рекламы
+        reviveAnim1["game_over_anim"].time = 1;
+        reviveAnim1["game_over_anim"].speed = -1;
+        reviveAnim2["revive_image_anim"].time = 1;
+        reviveAnim2["revive_image_anim"].speed = -1;
+        if (decline_enabled)
+        {
+            print("ANIM");
+            reviveAnim3["game_over_anim"].time = 1;
+            reviveAnim3["game_over_anim"].speed = -1;
+        }
+
+        reviveAnim1.Play();
+        reviveAnim2.Play();
+        reviveAnim3.Play();
+
+        Restart();
+    }
     public void game_end()
     {
         MoneyText.text = "$" + (get_pref("money")).ToString();
-
+        ad_time = 0;
         paused = true;
         pauseButton.enabled = false;
         platforms.GetComponent<PlatBehave>().paused = true;
@@ -127,37 +217,72 @@ public class GameUIScript : MonoBehaviour
         playImage.enabled = false;
         menuImage.enabled = true;
         quitButton.enabled = true;
-
-        print("dead");
-        fAnim1["game_over_anim"].speed = 1;
-        fAnim2["game_over_anim2"].speed = 1;
-        fAnim3["game_over_anim3"].speed = 1;
-        fAnim4["paused_breath"].speed = 1;
-        fAnim4["paused_breath"].time = 0;
-        rAnim2["game_over_anim4"].time = 0;
-        rAnim2["game_over_anim4"].speed = 1;
-
-        rAnim2.Play();
-        fAnim1.Play();
-        fAnim2.Play();
-        fAnim3.Play();
-        fAnim4.Play();
-        
+        adSkipButton.enabled = false;
         restartButton.enabled = true;
 
-        int score = int.Parse(CurrSText.text);
-
-        ScoreText.text = "Score: " + CurrSText.text;
-
-        int highscore = get_highscore();
-
-        if (score > highscore)
+        if (!ad_playing)
         {
-            PlayerPrefs.SetFloat("highscore", Mathf.Pow(score, 0.11764705f));
+            // смерть с рекламой 
+            ad_playing = true;
+            if (int.Parse(CurrSText.text) > 50 && ad_available && rewarded.IsLoaded())
+            {
+                fAnim1["game_over_anim"].speed = 1;
+                reviveAnim1["game_over_anim"].time = 0;
+                reviveAnim1["game_over_anim"].speed = 1;
+                reviveAnim2["revive_image_anim"].time = 0;
+                reviveAnim2["revive_image_anim"].speed = 1;
+                reviveAnim1.Play();
+                reviveAnim2.Play();
+            }  else
+            {
+                game_end();
+            }
         }
+        else
+        {
+            // смерть без рекламы
+            print("dead");
+            ad_playing = false;
+            fAnim1["game_over_anim"].speed = 1;
+            fAnim2["game_over_anim2"].speed = 1;
+            fAnim3["game_over_anim3"].speed = 1;
+            fAnim4["paused_breath"].speed = 1;
+            fAnim4["paused_breath"].time = 0;
+            rAnim2["game_over_anim4"].time = 0;
+            rAnim2["game_over_anim4"].speed = 1;
 
-        HighSText.text = "High: " + get_highscore();
-        
+            reviveAnim1["game_over_anim"].time = 0;
+            reviveAnim1["game_over_anim"].speed = 0;
+            reviveAnim2["revive_image_anim"].time = 0;
+            reviveAnim2["revive_image_anim"].speed = 0;
+            reviveAnim3["game_over_anim"].time = 0;
+            reviveAnim3["game_over_anim"].speed = 0;
+
+            rAnim2.Play();
+            fAnim1.Play();
+            fAnim2.Play();
+            fAnim3.Play();
+            fAnim4.Play();
+
+            reviveAnim1.Play();
+            reviveAnim2.Play();
+            reviveAnim3.Play();
+
+            restartButton.enabled = true;
+
+            int score = int.Parse(CurrSText.text);
+
+            ScoreText.text = "Score: " + CurrSText.text;
+
+            int highscore = get_highscore();
+
+            if (score > highscore)
+            {
+                PlayerPrefs.SetFloat("highscore", Mathf.Pow(score, 0.11764705f));
+            }
+
+            HighSText.text = "High: " + get_highscore();
+        }
     }
 
     void pause()
@@ -198,6 +323,9 @@ public class GameUIScript : MonoBehaviour
         pauseButton.onClick.AddListener(pause);
         quitButton.onClick.AddListener(quit);
         restartButton.onClick.AddListener(Restart);
+        adSkipButton.onClick.AddListener(game_end);
+        MobileAds.Initialize(initStatus => { });
+        RequestReliveRewarded();
     }
 
     // Update is called once per frame
@@ -209,6 +337,7 @@ public class GameUIScript : MonoBehaviour
         menuImage.enabled = false;
         quitButton.enabled = false;
         restartButton.enabled = false;
+        adSkipButton.enabled = false;
 
         pauseAnim["paused_breath"].speed = 0;
         pauseAnim["paused_breath"].time = 0;
@@ -231,12 +360,24 @@ public class GameUIScript : MonoBehaviour
         rAnim2["game_over_anim4"].time = 0;
         rAnim2["game_over_anim4"].speed = 0;
 
+        reviveAnim1["game_over_anim"].time = 0;
+        reviveAnim1["game_over_anim"].speed = 0;
+
+        reviveAnim2["revive_image_anim"].time = 0;
+        reviveAnim2["revive_image_anim"].speed = 0;
+
+        reviveAnim3["game_over_anim"].time = 0;
+        reviveAnim3["game_over_anim"].speed = 0;
+
         rAnim2.Play();
         fAnim1.Play();
         fAnim2.Play();
         fAnim3.Play();
         fAnim4.Play();
         rAnim1.Play();
+        reviveAnim1.Play();
+        reviveAnim2.Play();
+        reviveAnim3.Play();
 
     }
     void Update()
@@ -253,6 +394,30 @@ public class GameUIScript : MonoBehaviour
         {
             player.GetComponent<BallBehave>().Restart();
             isRestart = false;
+        }
+        
+        if (ad_playing)
+        {
+            ad_time += Time.deltaTime;
+        }
+
+        if (ad_playing && reviveAnim2["revive_image_anim"].time >= 1.99f)
+        {
+            reviveAnim2["revive_image_anim"].time = 1f;
+            reviveAnim2.Play();
+        }
+
+        if (ad_time > 3 && ad_playing && !decline_enabled)
+        {
+            print("VIEW BUTTON");
+            adSkipButton.enabled = true;
+            if (reviveAnim3["game_over_anim"].speed == 0)
+            {
+                reviveAnim3["game_over_anim"].time = 0;
+                reviveAnim3["game_over_anim"].speed = 1;
+                reviveAnim3.Play();
+                decline_enabled = true;
+            }
         }
     }
 }

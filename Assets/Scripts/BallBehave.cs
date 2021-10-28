@@ -94,7 +94,7 @@ public class BallBehave : MonoBehaviour
     public void Restart()
     {
         combo = 1;
-        score_text.text = "0";
+        
         rb.velocity = new Vector3(0, 0, 0);
         float camOffset = rb.position.y - cameraPos.position.y;
         
@@ -104,8 +104,7 @@ public class BallBehave : MonoBehaviour
         last_plat = -20;
 
         platforms.gameObject.GetComponent<PlatBehave>().RestartPlat();
-        cameraPos.gameObject.GetComponent<CameraBehave>().StartAnimaton();
-
+        cameraPos.gameObject.GetComponent<CameraBehave>().StartAnimaton(int.Parse(score_text.text));
 
     }
     public void Death()
