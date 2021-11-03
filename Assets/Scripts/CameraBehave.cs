@@ -38,7 +38,10 @@ public class CameraBehave : MonoBehaviour
 
     void Start()
     {
-        
+        Color color = new UnityEngine.Color(1, 0.196f, 0);
+        deathMat.SetColor("_Color", color);
+        Color color2 = new UnityEngine.Color(1, 0.078f, 0);
+        deathMat.SetColor("_EmissionColor", color2);
     }
 
     public void StartAnimaton(int score)

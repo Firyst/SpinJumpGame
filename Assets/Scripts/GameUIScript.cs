@@ -48,8 +48,10 @@ public class GameUIScript : MonoBehaviour
     private bool ad_playing = false;
     private bool ad_played = false;
     private bool decline_enabled = false; // вылезла ли кнопка no thanks
+    private bool ad_success = false;
 
     private float ad_time = 0;
+    private float restart_time = 0;
 
     public RewardedAd rewarded;
 
@@ -62,7 +64,7 @@ public class GameUIScript : MonoBehaviour
         rewarded = new RewardedAd(adUnitId);
 
         rewarded.OnUserEarnedReward += ad_end;
-        rewarded.OnAdClosed += ad_closed;
+        rewarded.OnAdFailedToShow += ad_closed;
 
         AdRequest request = new AdRequest.Builder().Build();
         rewarded.LoadAd(request);
@@ -146,8 +148,9 @@ public class GameUIScript : MonoBehaviour
         }
     }
 
-    public void ad_closed(object sender, EventArgs args)
+    public void ad_closed(object sender, AdErrorEventArgs args)
     {
+        print("AD CLOSED");
         ad_playing = true;
         game_end();
     }
@@ -196,6 +199,8 @@ public class GameUIScript : MonoBehaviour
     void ad_end(object sender, Reward args)
     {
         // вызывается после воспроизведнеия рекламы
+        print("AD SHOWN");
+        ad_success = true;
         reviveAnim1["game_over_anim"].time = 1;
         reviveAnim1["game_over_anim"].speed = -1;
         reviveAnim2["revive_image_anim"].time = 1;
@@ -215,6 +220,7 @@ public class GameUIScript : MonoBehaviour
     }
     public void game_end()
     {
+        ad_success = false;
         MoneyText.text = "$" + (get_pref("money")).ToString();
         ad_time = 0;
         paused = true;
@@ -386,6 +392,7 @@ public class GameUIScript : MonoBehaviour
         reviveAnim2.Play();
         reviveAnim3.Play();
 
+        restart_time = 0;
     }
     void Update()
     {
@@ -395,12 +402,12 @@ public class GameUIScript : MonoBehaviour
         }
         if (isRestart)
         {
-            // Debug.Log(deathAnim["death"].time);
-        }
-        if (isRestart && deathAnim["death"].time >= 0.4f)
-        {
-            player.GetComponent<BallBehave>().Restart();
-            isRestart = false;
+            restart_time += Time.deltaTime;
+            if (restart_time > 0.4f)
+            {
+                player.GetComponent<BallBehave>().Restart();
+                isRestart = false;
+            }
         }
         
         if (ad_playing)
