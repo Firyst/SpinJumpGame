@@ -53,7 +53,7 @@ public class CoinHandler : MonoBehaviour
                 // проходимся по детям (монеткам), перемещаем их по необходимости
             {
                 coin.GetComponent<MoneyScript>().moneyMesh.GetComponent<MeshRenderer>().material = Bronze;
-                int pos = last_coin - Random.Range(5, 10) * 10;
+                int pos = last_coin - Random.Range(4, 6) * 10;
                 coin.transform.position = new Vector3(coin.transform.position.x, pos, coin.transform.position.z);
                 coin.GetComponent<MoneyScript>().SetCollider(true); // включение коллайдера на монетке
                 last_coin = pos;
