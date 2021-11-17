@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using GooglePlayGames;
+using GooglePlayGames.BasicApi;
+using UnityEngine.SocialPlatforms;
 
 
 public class MenuScript : MonoBehaviour
 {
-    public Button playButton, shopButton;
+    public Button playButton, shopButton, lbButton;
     public Button shopLeftButton, shopRightButton, shopLeftButtonO, shopRightButtonO, shopBuyButton, shopBuyButtonO, shopBackButton;
     public Text outerSkinText, innerSkinText, outerSkinPrice, innerSkinPrice, moneyText;
     public Image fader;
@@ -34,6 +37,8 @@ public class MenuScript : MonoBehaviour
     private int[] skinsDataO;
 
     private bool is_shop = false;
+
+    [HideInInspector] private const string leaderBoard = "CgkIt_j61YsBEAIQAQ";
 
     int get_pref(string field)
     {
@@ -125,7 +130,7 @@ public class MenuScript : MonoBehaviour
     {
         is_shop = true;
         ShopButtons.transform.localPosition = new Vector3(0, 0, 0);
-        title.text = "Shop";
+        title.text = "Store";
         playButton.enabled = false;
         shopButton.enabled = false;
 
@@ -288,6 +293,26 @@ public class MenuScript : MonoBehaviour
         PlayerPrefs.SetFloat("OS", Mathf.Pow(outerSkinEnter, 0.11764705f));
         PlayerPrefs.SetFloat("money", Mathf.Pow(currentMoney, 0.11764705f));
     }
+
+    private void OpenLb()
+    {
+        print("lb");
+        Social.ShowLeaderboardUI();
+    }
+
+    int get_highscore()
+    {
+        float highscore = Mathf.Pow(PlayerPrefs.GetFloat("highscore"), 8.5f);
+        if (Mathf.Abs(highscore - Mathf.RoundToInt(highscore)) < 0.001f)
+        {
+            return Mathf.RoundToInt(highscore);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
     void Start()
     {
         innerSkinC = menuBall.GetComponent<SkinHandler>().innerSkins.Length;
@@ -320,6 +345,7 @@ public class MenuScript : MonoBehaviour
         shopRightButtonO.onClick.AddListener(MoveRightO);
         shopBuyButton.onClick.AddListener(SelectInnerSkin);
         shopBuyButtonO.onClick.AddListener(SelectOuterSkin);
+        lbButton.onClick.AddListener(OpenLb);
 
 
         fadeAnim3["fade3"].speed = 0;
@@ -347,6 +373,22 @@ public class MenuScript : MonoBehaviour
         skinsDataO = decode_skins_data("OSD");
 
         Reload();
+
+
+
+        // google play games
+
+        PlayGamesPlatform.DebugLogEnabled = true;
+        PlayGamesPlatform.Activate();
+        Social.localUser.Authenticate(success =>
+        {
+            if (success)
+            {
+                print("GPS login success!");
+            }
+        });
+
+        Social.ReportScore(get_highscore(), leaderBoard, (bool success) => { });
     }
 
     // Update is called once per frame
@@ -358,5 +400,10 @@ public class MenuScript : MonoBehaviour
         {
             SceneManager.LoadScene(1);
         }
+    }
+    private void OnApplicationQuit()
+    {
+        print("goodbye");
+        PlayGamesPlatform.Instance.SignOut();
     }
 }

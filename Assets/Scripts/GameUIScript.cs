@@ -6,9 +6,12 @@ using UnityEngine.SceneManagement;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Common;
 using System;
+using GooglePlayGames;
+using UnityEngine.SocialPlatforms;
 
 public class GameUIScript : MonoBehaviour
 {
+    
     public Button pauseButton;
     public Button quitButton;
     public Button restartButton;
@@ -58,8 +61,8 @@ public class GameUIScript : MonoBehaviour
     // Start is called before the first frame update
     public void RequestReliveRewarded()
     {
-        string adUnitId = "ca-app-pub-3940256099942544/5224354917";
-        //string adUnitId = "ca-app-pub-8454720276447685/2412245698"; // ÃÓÈ ¿…ƒ»";
+        //string adUnitId = "ca-app-pub-3940256099942544/5224354917"; // test
+        string adUnitId = "ca-app-pub-8454720276447685/2412245698"; // ÃÓÈ ¿…ƒ»";
 
         rewarded = new RewardedAd(adUnitId);
 
@@ -145,6 +148,7 @@ public class GameUIScript : MonoBehaviour
             coins.GetComponent<CoinHandler>().HideCoins();
             // platforms.GetComponent<PlatBehave>().Restart();
             ad_played = false;
+            quitButton.enabled = false;
         }
     }
 
